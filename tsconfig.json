@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "moduleResolution": "node",
-    "jsx": "preserve",
+    "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "target": "es6",
     "noImplicitAny": true,

@@ -68,6 +68,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
   _isMounted = false;
 
   shouldUpdateChildren = false;
+  direction = this.props.direction || DOWN;
 
   shouldComponentUpdate(nextProps: any) {
     this.shouldUpdateChildren = this.props.children !== nextProps.children;
@@ -272,8 +273,8 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     delete props.damping;
 
     const {
-      className, prefixCls, children, getScrollContainer,
-      direction, onRefresh, refreshing, indicator, distanceToRefresh, ...restProps,
+      className, prefixCls, children, getScrollContainer, contentContainerStyle, indicatorStyle,
+      direction, onRefresh, refreshing, indicator, distanceToRefresh, ...restProps
     } = props;
 
     const renderChildren = <StaticRenderer
@@ -282,10 +283,10 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     const renderRefresh = (cls: string) => {
       const cla = classNames(cls, !this.state.dragOnEdge && `${prefixCls}-transition`);
       return (
-        <div className={`${prefixCls}-content-wrapper`}>
+        <div className={`${prefixCls}-content-wrapper`} style={contentContainerStyle} >
           <div className={cla} ref={el => this.contentRef = el}>
             {direction === UP ? renderChildren : null}
-            <div className={`${prefixCls}-indicator`}>
+            <div className={`${prefixCls}-indicator`} style={indicatorStyle} >
               {(indicator as any)[this.state.currSt] || (INDICATOR as any)[this.state.currSt]}
             </div>
             {direction === DOWN ? renderChildren : null}

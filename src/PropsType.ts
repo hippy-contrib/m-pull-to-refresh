@@ -14,6 +14,8 @@ export interface PropsType {
   distanceToRefresh: number;
   onRefresh: () => void;
   indicator: Indicator;
+  contentContainerStyle?: React.CSSProperties;
+  indicatorStyle?: React.CSSProperties;
   prefixCls?: string;
   className?: string;
   style?: React.CSSProperties;
