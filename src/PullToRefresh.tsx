@@ -2,6 +2,10 @@ import React from 'react';
 import classNames from 'classnames';
 import { PropsType, Indicator } from './PropsType';
 
+console.log('use both 20 footer refresh');
+
+const REFRESH_DISTANCE_SCREEN_Y_OFFSET = 1;
+
 class StaticRenderer extends React.Component<any, any> {
   shouldComponentUpdate(nextProps: any) {
     return nextProps.shouldUpdate;
@@ -21,6 +25,7 @@ const isWebView = typeof navigator !== 'undefined' &&
   /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
 const DOWN = 'down';
 const UP = 'up';
+const BOTH = 'both';
 const INDICATOR = { activate: 'release', deactivate: 'pull', release: 'loading', finish: 'finish' };
 
 let supportsPassive = false;
@@ -69,8 +74,11 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
 
   shouldUpdateChildren = false;
   direction = this.props.direction || DOWN;
+  currentMoveDirection = DOWN;
+  indicatorHeight = this.props.indicatorHeight;  
 
   shouldComponentUpdate(nextProps: any) {
+    // @ts-ignore
     this.shouldUpdateChildren = this.props.children !== nextProps.children;
     return true;
   }
@@ -152,6 +160,7 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
 
   isEdge = (ele: any, direction: string) => {
     const container = this.props.getScrollContainer();
+    // @ts-ignore
     if (container && container === document.body) {
       // In chrome61 `document.body.scrollTop` is invalid
       const scrollNode = document.scrollingElement ? document.scrollingElement : document.body;
@@ -185,20 +194,26 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     // 使用 pageY 对比有问题
     const _screenY = e.touches[0].screenY;
     const _screenX = e.touches[0].screenX;
-    const { direction } = this.props;
 
+    
     // 横向滑动不处理
     if (Math.abs(_screenX - this._startScreenX) > 20 * window.devicePixelRatio) {
       return;
     }
 
+    if (this._startScreenY < _screenY) {
+      this.currentMoveDirection = DOWN;
+    } else {
+      this.currentMoveDirection = UP;
+    }
+
     // 拖动方向不符合的不处理
-    if (direction === UP && this._startScreenY < _screenY ||
-      direction === DOWN && this._startScreenY > _screenY) {
+    if ((this.direction === UP || this.currentMoveDirection === UP) && this._startScreenY < _screenY ||
+      (this.direction === DOWN || this.currentMoveDirection === DOWN) && this._startScreenY > _screenY) {
       return;
     }
 
-    if (this.isEdge(ele, direction)) {
+    if (this.isEdge(ele, this.currentMoveDirection)) {
       if (!this.state.dragOnEdge) {
         // 当用户开始往上滑的时候isEdge还是false的话，会导致this._ScreenY不是想要的，只有当isEdge为true时，再上滑，才有意义
         // 下面这行代码解决了上面这个问题
@@ -249,7 +264,13 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
         }
         this._timer = undefined;
       }, 1000);
-      this.props.onRefresh();
+      if (this.direction === BOTH && this.currentMoveDirection == UP) {
+        if (this.props.onFooterRefresh) {
+          this.props.onFooterRefresh();
+        }
+      } else {
+        this.props.onRefresh();
+      }
     } else {
       this.reset();
     }
@@ -273,21 +294,72 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
     delete props.damping;
 
     const {
-      className, prefixCls, children, getScrollContainer, contentContainerStyle, indicatorStyle,
-      direction, onRefresh, refreshing, indicator, distanceToRefresh, ...restProps
+      // @ts-ignore
+      className, prefixCls, children, getScrollContainer, footerIndicatorHeight = 0, direction, onRefresh, 
+      refreshing, indicator, indicatorHeight, onFooterRefresh, footerIndicator, distanceToRefresh, ...restProps
     } = props;
+
+    
+    const getIndicatorStyle = () => {
+      console.log('get indicatorHeight', indicatorHeight);
+      if (direction === UP) {
+        return {
+          height: `${indicatorHeight}px`,
+          marginBottom: `-${indicatorHeight + REFRESH_DISTANCE_SCREEN_Y_OFFSET}px`,
+        }
+      }
+      if (direction === DOWN) {
+        return {
+          height: `${indicatorHeight}px`,
+          marginTop: `-${indicatorHeight + REFRESH_DISTANCE_SCREEN_Y_OFFSET}px`,
+        }
+      }
+      if (direction === BOTH) {
+        return {
+          height: `${footerIndicatorHeight}px`,
+          marginBottom: `-${ footerIndicatorHeight + REFRESH_DISTANCE_SCREEN_Y_OFFSET}px`,
+        }
+      }
+    };
 
     const renderChildren = <StaticRenderer
       shouldUpdate={this.shouldUpdateChildren} render={() => children} />;
 
+    const renderBothRefresh = () => (
+      <React.Fragment>
+        <div className={`${prefixCls}-indicator`} style={{
+          height: `${indicatorHeight}px`,
+          marginTop: `-${indicatorHeight + REFRESH_DISTANCE_SCREEN_Y_OFFSET}px`
+        }} >
+          {(indicator as any)[this.state.currSt] || (INDICATOR as any)[this.state.currSt]}
+        </div>
+        { renderChildren }
+      </React.Fragment>
+    )
+
+    const getIndicator = () => {
+      // 1. direction UP, DOWN -> use indicator
+      // 2. direction BOTH -> use footerIndicator
+      if (direction !== BOTH) {
+        return indicator;
+      }
+      if (footerIndicator) {
+        return footerIndicator;
+      } else {
+        return indicator;
+      }
+    }
+
+
     const renderRefresh = (cls: string) => {
       const cla = classNames(cls, !this.state.dragOnEdge && `${prefixCls}-transition`);
       return (
-        <div className={`${prefixCls}-content-wrapper`} style={contentContainerStyle} >
+        <div className={`${prefixCls}-content-wrapper`} style={{ overflow: 'hidden' }} >
           <div className={cla} ref={el => this.contentRef = el}>
+            { direction === BOTH ? renderBothRefresh() : null }
             {direction === UP ? renderChildren : null}
-            <div className={`${prefixCls}-indicator`} style={indicatorStyle} >
-              {(indicator as any)[this.state.currSt] || (INDICATOR as any)[this.state.currSt]}
+            <div className={`${prefixCls}-indicator`} style={getIndicatorStyle()} >
+              {(getIndicator() as any)[this.state.currSt] || (INDICATOR as any)[this.state.currSt]}
             </div>
             {direction === DOWN ? renderChildren : null}
           </div>

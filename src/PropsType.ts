@@ -9,13 +9,15 @@ export interface Indicator {
 
 export interface PropsType {
   getScrollContainer: () => React.ReactNode;
-  direction: 'down' | 'up';
+  direction: 'down' | 'up' | 'both' | string;
   refreshing?: boolean;
   distanceToRefresh: number;
   onRefresh: () => void;
+  onFooterRefresh?: () => void;
   indicator: Indicator;
-  contentContainerStyle?: React.CSSProperties;
-  indicatorStyle?: React.CSSProperties;
+  footerIndicator?: Indicator;
+  indicatorHeight: number;
+  footerIndicatorHeight?: number;
   prefixCls?: string;
   className?: string;
   style?: React.CSSProperties;
