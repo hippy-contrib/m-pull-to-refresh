@@ -2,8 +2,6 @@ import React from 'react';
 import classNames from 'classnames';
 import { PropsType, Indicator } from './PropsType';
 
-console.log('use both 20 footer refresh');
-
 const REFRESH_DISTANCE_SCREEN_Y_OFFSET = 1;
 
 class StaticRenderer extends React.Component<any, any> {
