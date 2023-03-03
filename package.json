@@ -23,7 +23,7 @@
   "license": "MIT",
   "module": "./es/index",
   "config": {
-    "port": 8899
+    "port": 8888
   },
   "scripts": {
     "build": "rollup -c",
@@ -32,10 +32,6 @@
     "emample-build": "rc-tools run build",
     "gh-pages": "rc-tools run gh-pages",
     "start": "rc-tools run server",
-    "prepublish": "rc-tools run guard",
-    "prepare": "rc-tools run guard",
-    "prepublishOnly": "rc-tools run guard",
-    "pub": "rc-tools run pub --babel-runtime",
     "lint": "rc-tools run lint --no-js-lint",
     "test": "jest",
     "coverage": "jest --coverage"

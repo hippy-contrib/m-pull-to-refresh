@@ -299,7 +299,6 @@ export default class PullToRefresh extends React.Component<PropsType, any> {
 
     
     const getIndicatorStyle = () => {
-      console.log('get indicatorHeight', indicatorHeight);
       if (direction === UP) {
         return {
           height: `${indicatorHeight}px`,
