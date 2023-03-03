@@ -94,7 +94,7 @@
   "pre-commit": [
     "lint"
   ],
-  "main": "rollup.config.js",
+  "main": "es/index.js",
   "directories": {
     "example": "examples",
     "test": "tests"
