@@ -1,6 +1,6 @@
 {
   "name": "@hippy/rmc-pull-to-refresh",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "React Mobile Pull To Refresh Component",
   "keywords": [
     "react",
@@ -82,8 +82,8 @@
     "jest": "^20.0.4",
     "pre-commit": ">=1.0.0",
     "rc-tools": ">=6.0.0",
-    "react": ">=16.11.0",
-    "react-dom": ">=16.11.0",
+    "react": ">=16.11.0 <18.0.0",
+    "react-dom": ">=16.11.0 <18.0.0",
     "react-test-renderer": "^15.5.0",
     "rollup": "^2.75.7",
     "rollup-plugin-dts": "^4.2.2",
