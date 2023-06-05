@@ -17,11 +17,13 @@
     "url": "https://github.com/hippy-contrib/m-pull-to-refresh/issues"
   },
   "files": [
-    "es",
+    "dist",
     "assets/*.css"
   ],
   "license": "MIT",
-  "module": "./es/index",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "config": {
     "port": 8888
   },
@@ -90,7 +92,6 @@
   "pre-commit": [
     "lint"
   ],
-  "main": "es/index.js",
   "directories": {
     "example": "examples",
     "test": "tests"

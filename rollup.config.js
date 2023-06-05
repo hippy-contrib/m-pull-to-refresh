@@ -6,12 +6,15 @@ const dts = require('rollup-plugin-dts').default;
 const path = require('path');
 const babelPlugin = require('@rollup/plugin-babel');
 const { babel, getBabelOutputPlugin } = babelPlugin;
+const config = {
+  input: 'src/index.tsx',
+  external: ['react', 'classnames'],
+}
 
 export default [
   {
-    input: 'src/index.tsx',
+    ...config,
     acornInjectPlugins: [jsx()],
-    external: ['react', 'classnames'],
     plugins: [
       resolve(),
       commonjs(),
@@ -30,13 +33,33 @@ export default [
         },
       }),
     ],
+    output: [
+      {
+        dir: 'dist',
+        entryFileNames: '[name].js',
+        chunkFileNames: '__chunk__/[name].js',
+        format: 'es',
+        // 为了兼容新语法，使用 babel 转译一下
+        plugins: [getBabelOutputPlugin({ presets: ['@babel/preset-env'] })]
+      },
+      {
+        dir: 'dist',
+        entryFileNames: '[name].cjs',
+        chunkFileNames: '__chunk__/[name].cjs',
+        format: 'cjs',
+        exports: 'auto',
+        // 为了兼容新语法，使用 babel 转译一下
+        plugins: [getBabelOutputPlugin({ presets: ['@babel/preset-env'] })]
+      }
+    ],
+  },
+  {
+    input: 'src/index.tsx',
     output: {
-      dir: 'es',
-      entryFileNames: '[name].js',
-      chunkFileNames: '__chunk__/[name].js',
+      file: 'dist/indes.d.ts',
       format: 'es',
-      // 为了兼容新语法，使用 babel 转译一下
-      plugins: [getBabelOutputPlugin({ presets: ['@babel/preset-env'] })]
     },
-  }  
+    external: config.external,
+    plugins: [dts()],
+  }
 ]
