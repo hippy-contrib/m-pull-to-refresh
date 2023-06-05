@@ -56,7 +56,7 @@ export default [
   {
     input: 'src/index.tsx',
     output: {
-      file: 'dist/indes.d.ts',
+      file: 'dist/index.d.ts',
       format: 'es',
     },
     external: config.external,
