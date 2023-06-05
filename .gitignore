@@ -25,5 +25,5 @@ lib
 coverage
 yarn.lock
 package-lock.json
-es
+dist
 _ts2js
